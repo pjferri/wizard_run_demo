@@ -1,10 +1,8 @@
 from turtle import circle, update
 import pgzrun
 from pgzhelper import *
+import random
 
-
-#fireball = Actor('fireball', (1000, 160))
-fireball = Actor('fireball', (1000,160))
 
 playerXpos = 50
 playerYpos = 252
@@ -14,6 +12,11 @@ wizard = Actor('tile0', (playerCordinates))
 run_images = ['tile0', 'tile1', 'tile2', 'tile3', 'tile4', 'tile5', 'tile6', 'tile7']
 wizard.images = run_images
 
+fireball = Actor('fireball', (1000,160))
+
+orb = Actor('orb0', (1000, 250)) #250 is where the player is, 160 is just above him
+orb_flare = ['orb1','orb2','orb3','orb4','orb5','orb6','orb7','orb8','orb9','orb10','orb11', 'orb12','orb13']
+orb.images = orb_flare
 
 WIDTH =  800
 HEIGHT = wizard.height + 200
@@ -27,7 +30,7 @@ LIGHTBLUE = 169,228,239
 
 
 Ground = Rect((-100, 300), (1000, 100)) #It's x,y and then size
-wizardCheck = Rect((playerXpos - 40,playerYpos - 40), (wizard.width - 170, wizard.height - 100)) #Creates a rectangle around the player for collision
+wizardCheck = Rect((playerXpos - 40, playerYpos - 40), (wizard.width - 170, wizard.height - 100)) #Creates a rectangle around the player for collision
 
 global currentTile
 currentTile = 0
@@ -44,13 +47,15 @@ def draw():
     screen.draw.filled_rect(Ground, LIGHTBLUE)
     fireball.draw()
     wizard.draw()
+    orb.draw()
     screen.draw.rect(wizardCheck,WHITE) #This shows the collision rectangle
     screen.draw.text(str(score), midtop=(400, 0))
     if gameOver:
         screen.draw.text("Game Over", (350, 60))
     #screen.draw.filled_rect(wizardCheck, RED) This is just to check where the collision rectangle is
     
-wizard.fps = 10
+wizard.fps = 10 #Controls the animation speed, the default is 5
+orb.fps = 10
 
 def update(): 
     global score
@@ -58,7 +63,13 @@ def update():
     if fireball.x < 0 and gameOver == False: #If fireball reaches the end, reset it and increase the score by one
         fireball.x = 1000
         score+=1
-    wizard.animate()
+    orb.x -= 3
+    if orb.x < 0 and gameOver == False:
+        orb.x = 1000
+        score+=1
+    if gameOver == False and jumpCount < 1:
+        wizard.animate()
+    orb.animate()
     checkGameOver()
 
 def on_key_down(key):
@@ -80,13 +91,12 @@ def land():
     global jumpCount
     wizard.y = playerYpos
     wizardCheck.y = playerYpos - 40
-    wizard.image = "wizardman"
     jumpCount = 0
 
 def checkGameOver():
     global gameOver
     if fireball.colliderect(wizardCheck):
-        # wizard.image = "death"
+        wizard.image = "tile6"
         gameOver = True
 
 def switchRunImage():
