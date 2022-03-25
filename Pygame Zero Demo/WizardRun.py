@@ -1,3 +1,4 @@
+from ast import Or
 from turtle import circle, update
 import pgzrun
 from pgzhelper import *
@@ -57,18 +58,24 @@ def draw():
 wizard.fps = 10 #Controls the animation speed, the default is 5
 orb.fps = 10
 
+fireballSpeed = 4
+orbSpeed = 3
+
 def update(): 
     global score
-    fireball.x -= 4
+    fireball.x -= fireballSpeed
     if fireball.x < 0 and gameOver == False: #If fireball reaches the end, reset it and increase the score by one
         fireball.x = 1000
         score+=1
-    orb.x -= 3
+    orb.x -= orbSpeed
     if orb.x < 0 and gameOver == False:
         orb.x = 1000
         score+=1
     if gameOver == False and jumpCount < 1:
         wizard.animate()
+    if score % 4 == 0 and score > 1:
+        clock.schedule(increaseDifficulty, 0.1)
+
     orb.animate()
     checkGameOver()
 
@@ -95,11 +102,33 @@ def land():
 
 def checkGameOver():
     global gameOver
-    if fireball.colliderect(wizardCheck):
+    if fireball.colliderect(wizardCheck) or orb.circle_collidepoint(70, wizardCheck.x, wizardCheck.y): #70 represents the size of the collision circle, the x and y are 
         wizard.image = "tile6"
         gameOver = True
 
-def switchRunImage():
-    wizard.next_image()
+
+def increaseDifficulty():
+    global fireballSpeed
+    global orbSpeed
+    global score
+    
+    if score == 4:
+        fireballSpeed = 5
+        orbSpeed = 5
+    if score == 8:
+        fireballSpeed = 6
+        orbSpeed = 6
+    if score == 12:
+        fireballSpeed = 7
+        orbSpeed = 7
+    if score == 16:
+        fireballSpeed = 8
+        orbSpeed = 8
+    if score == 20:
+        fireballSpeed = 9
+        orbSpeed = 9
+    if score > 24:
+        fireballSpeed = 10
+        orbSpeed = 10
 
 pgzrun.go()
